@@ -1,0 +1,226 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+struct data
+{
+	double w, h, r, i;
+	int screenWidth, screenHeight;
+};
+
+RWTexture2D<float4> Result;
+StructuredBuffer<data> buffer;
+
+uint iterations;
+
+[numthreads(24, 24, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+
+	double real, imag;
+	double real2, imag2;
+	double xAdjust = (double)id.x / buffer[0].screenWidth * buffer[0].w;
+	double yAdjust = (double)id.y / buffer[0].screenHeight * buffer[0].h;
+	uint ite = 0;
+
+	float4 CalcColor = { 0.0f , 0.0f, 0.0f, 1.0f };
+
+	real = buffer[0].r + xAdjust;
+	imag = buffer[0].i + yAdjust;
+
+	double tempImag2 = imag * imag;
+	double temp = real - 0.25;
+	double q = temp * temp + tempImag2;
+	double a = q * (q + temp);
+	double b = 0.25 * tempImag2;
+	if (a < b)
+		Result[id.xy] = CalcColor;
+
+	//Period-2 bulb
+	temp = real + 1.0;
+	temp = temp * temp + tempImag2;
+	if (temp < 0.0625)
+		Result[id.xy] = CalcColor;
+
+	for (uint i = 0; i < iterations; i++)
+	{
+		real2 = real * real;
+		imag2 = imag * imag;
+
+		if (real2 + imag2 > 4.0)
+		{
+			break;
+		}
+		else {
+			imag = (2 * real * imag + buffer[0].i + yAdjust);
+			real = (real2 - imag2 + buffer[0].r + xAdjust);
+			ite++;
+		}
+	}
+
+	
+
+	//First
+	//if (ite != iterations)
+	//{
+	//    int max = iterations / 3;
+	//    CalcColor[0] = (float)(ite % (max * 2)) / (max * 2);
+	//    CalcColor[1] = (float)(ite % (max)) / (max);
+	//    CalcColor[2] = (float)(ite % iterations) / iterations;
+	//}
+
+	//float grey = (float)ite / iterations;
+	//Result[id.xy] = float4(grey, grey, grey, 1.0f);
+
+	//float n = (float)ite;
+	//float x = 0.1f;
+	//// Thank you @Eriksonn - Wonderful Magic Fractal Oddball Man
+	//CalcColor[0] = 0.5f * sin(x * n) + 0.5f;
+	//CalcColor[1] = 0.5f * sin(x * n + 2.094f) + 0.5f;
+	//CalcColor[2] = 0.5f * sin(x * n + 4.188f) + 0.5f;
+
+	if (ite != iterations)
+	{
+		int colorNr = ite % 16;
+
+		switch (colorNr)
+		{
+		case 0:
+		{
+			CalcColor[0] = 66.0f / 255.0f;
+			CalcColor[1] = 30.0f / 255.0f;
+			CalcColor[2] = 15.0f / 255.0f;
+
+			break;
+		}
+		case 1:
+		{
+			CalcColor[0] = 25.0f / 255.0f;
+			CalcColor[1] = 7.0f / 255.0f;
+			CalcColor[2] = 26.0f / 255.0f;
+			break;
+		}
+		case 2:
+		{
+			CalcColor[0] = 9.0f / 255.0f;
+			CalcColor[1] = 1.0f / 255.0f;
+			CalcColor[2] = 47.0f / 255.0f;
+			break;
+		}
+
+		case 3:
+		{
+			CalcColor[0] = 4.0f / 255.0f;
+			CalcColor[1] = 4.0f / 255.0f;
+			CalcColor[2] = 73.0f / 255.0f;
+			break;
+		}
+		case 4:
+		{
+			CalcColor[0] = 0.0f / 255.0f;
+			CalcColor[1] = 7.0f / 255.0f;
+			CalcColor[2] = 100.0f / 255.0f;
+			break;
+		}
+		case 5:
+		{
+			CalcColor[0] = 12.0f / 255.0f;
+			CalcColor[1] = 44.0f / 255.0f;
+			CalcColor[2] = 138.0f / 255.0f;
+			break;
+		}
+		case 6:
+		{
+			CalcColor[0] = 24.0f / 255.0f;
+			CalcColor[1] = 82.0f / 255.0f;
+			CalcColor[2] = 177.0f / 255.0f;
+			break;
+		}
+		case 7:
+		{
+			CalcColor[0] = 57.0f / 255.0f;
+			CalcColor[1] = 125.0f / 255.0f;
+			CalcColor[2] = 209.0f / 255.0f;
+			break;
+		}
+		case 8:
+		{
+			CalcColor[0] = 134.0f / 255.0f;
+			CalcColor[1] = 181.0f / 255.0f;
+			CalcColor[2] = 229.0f / 255.0f;
+			break;
+		}
+		case 9:
+		{
+			CalcColor[0] = 211.0f / 255.0f;
+			CalcColor[1] = 236.0f / 255.0f;
+			CalcColor[2] = 248.0f / 255.0f;
+			break;
+		}
+		case 10:
+		{
+			CalcColor[0] = 241.0f / 255.0f;
+			CalcColor[1] = 233.0f / 255.0f;
+			CalcColor[2] = 191.0f / 255.0f;
+			break;
+		}
+		case 11:
+		{
+			CalcColor[0] = 248.0f / 255.0f;
+			CalcColor[1] = 201.0f / 255.0f;
+			CalcColor[2] = 95.0f / 255.0f;
+			break;
+		}
+		case 12:
+		{
+			CalcColor[0] = 255.0f / 255.0f;
+			CalcColor[1] = 170.0f / 255.0f;
+			CalcColor[2] = 0.0f / 255.0f;
+			break;
+		}
+		case 13:
+		{
+			CalcColor[0] = 204.0f / 255.0f;
+			CalcColor[1] = 128.0f / 255.0f;
+			CalcColor[2] = 0.0f / 255.0f;
+			break;
+		}
+		case 14:
+		{
+			CalcColor[0] = 153.0f / 255.0f;
+			CalcColor[1] = 87.0f / 255.0f;
+			CalcColor[2] = 0.0f / 255.0f;
+			break;
+		}
+		case 15:
+		{
+			CalcColor[0] = 106.0f / 255.0f;
+			CalcColor[1] = 52.0f / 255.0f;
+			CalcColor[2] = 3.0f / 255.0f;
+			break;
+		}
+		}
+	}
+
+	//float col = cos(ite);
+	//
+	//if (ite != iterations)
+	//{
+	//	CalcColor[0] = pow(col, 4);
+	//	CalcColor[1] = pow(col, 16);
+	//	CalcColor[2] = exp(col);
+	//}
+
+
+	//float col = (float)ite / iterations;
+	//
+	//if (ite != iterations)
+	//{
+	//	CalcColor[0] = col;
+	//	CalcColor[1] = col * 2.0f;
+	//	CalcColor[2] = col * 3.0f;
+	//}
+
+	Result[id.xy] = CalcColor;
+}
