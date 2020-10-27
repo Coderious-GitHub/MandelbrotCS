@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class Mandelbrot : MonoBehaviour
 {
+	//Mandelbrot set parameters
     double width = 4.5;
     double height = 4.5;
     double rStart = -2.0;
