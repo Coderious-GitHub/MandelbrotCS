@@ -1,5 +1,5 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
+using TMPro;
 using UnityEngine.UI;
 
 public class Mandelbrot : MonoBehaviour
@@ -60,7 +60,7 @@ public class Mandelbrot : MonoBehaviour
             }
             else
             {
-                imag = 2 * real * imag + cImag;
+                imag = 2.0 * real * imag + cImag;
                 real = real2 - imag2 + cReal;
                 mValue++;
             }

@@ -25,14 +25,14 @@ public class CSMandelbrot : MonoBehaviour
     int maxIteration = 1024;
 
 
-
-    public struct dataStruct
+    //Data for the Compute Shader
+    public struct DataStruct
     {
         public double w, h, r, i;
         public int screenWidth, screenHeight;
     }
 
-    dataStruct[] data = new dataStruct[1];
+    DataStruct[] data = new DataStruct[1];
 
 
     // Start is called before the first frame update
@@ -40,7 +40,7 @@ public class CSMandelbrot : MonoBehaviour
     {
         height = width * Screen.height / Screen.width;
 
-        data[0] = new dataStruct
+        data[0] = new DataStruct
         {
             w = width,
             h = height,
@@ -90,14 +90,14 @@ public class CSMandelbrot : MonoBehaviour
 
     IEnumerator ZoomIn()
     {
-        maxIteration = Mathf.Max(maxIteration, maxIteration + increment);
+        maxIteration = Mathf.Max(100, maxIteration + increment);
 
         double wFactor = width * zoomSpeed * Time.deltaTime;
         double hFactor = height * zoomSpeed * Time.deltaTime;
         width -= wFactor;
         height -= hFactor;
-        rStart += wFactor / 2.0f;
-        iStart += hFactor / 2.0f;
+        rStart += wFactor / 2.0;
+        iStart += hFactor / 2.0;
 
         data[0].w = width;
         data[0].h = height;
@@ -111,14 +111,14 @@ public class CSMandelbrot : MonoBehaviour
 
     IEnumerator ZoomOut()
     {
-        maxIteration = Mathf.Max(maxIteration, maxIteration - increment);
+        maxIteration = Mathf.Max(100, maxIteration - increment);
 
         double wFactor = width * zoomSpeed * Time.deltaTime;
         double hFactor = height * zoomSpeed * Time.deltaTime;
         width += wFactor;
         height += hFactor;
-        rStart -= wFactor / 2.0f;
-        iStart -= hFactor / 2.0f;
+        rStart -= wFactor / 2.0;
+        iStart -= hFactor / 2.0;
 
         data[0].w = width;
         data[0].h = height;
@@ -132,8 +132,8 @@ public class CSMandelbrot : MonoBehaviour
 
     void CenterScreen()
     {
-        rStart += (Input.mousePosition.x - (Screen.width / 2.0f)) / Screen.width * width;
-        iStart += (Input.mousePosition.y - (Screen.height / 2.0f)) / Screen.height * height;
+        rStart += (Input.mousePosition.x - (Screen.width / 2.0)) / Screen.width * width;
+        iStart += (Input.mousePosition.y - (Screen.height / 2.0)) / Screen.height * height;
 
         data[0].r = rStart;
         data[0].i = iStart;

@@ -17,7 +17,6 @@ uint iterations;
 [numthreads(24, 24, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
-
 	double real, imag;
 	double real2, imag2;
 	double xAdjust = (double)id.x / buffer[0].screenWidth * buffer[0].w;
@@ -29,19 +28,14 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 	real = buffer[0].r + xAdjust;
 	imag = buffer[0].i + yAdjust;
 
-	double tempImag2 = imag * imag;
-	double temp = real - 0.25;
-	double q = temp * temp + tempImag2;
-	double a = q * (q + temp);
-	double b = 0.25 * tempImag2;
-	if (a < b)
+	//Cardioid-bulb checking
+	double q = (real - 0.25) * (real - 0.25) + imag * imag;
+	if (q * (q + (real - 0.25)) < 0.25 * (imag * imag))
+	{
 		Result[id.xy] = CalcColor;
+		return;
+	}
 
-	//Period-2 bulb
-	temp = real + 1.0;
-	temp = temp * temp + tempImag2;
-	if (temp < 0.0625)
-		Result[id.xy] = CalcColor;
 
 	for (uint i = 0; i < iterations; i++)
 	{
@@ -53,13 +47,12 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 			break;
 		}
 		else {
-			imag = (2 * real * imag + buffer[0].i + yAdjust);
+			imag = (2.0 * real * imag + buffer[0].i + yAdjust);
 			real = (real2 - imag2 + buffer[0].r + xAdjust);
 			ite++;
 		}
 	}
 
-	
 
 	//First
 	//if (ite != iterations)
